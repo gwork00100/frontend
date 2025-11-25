@@ -1,28 +1,44 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Media Funnel Frontend</title>
-  </head>
-  <body>
-    <h1>Media Funnel</h1>
-    <button id="fetchBtn">Fetch Data</button>
-    <pre id="output"></pre>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopClone — Amazon Style Store</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-    <script>
-      const backendUrl = "https://media-funnel-backend.onrender.com";
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">ShopClone</div>
 
-      document.getElementById("fetchBtn").onclick = () => {
-        fetch(`${backendUrl}/api/some-endpoint`)
-          .then(res => res.json())
-          .then(data => {
-            document.getElementById("output").textContent =
-              JSON.stringify(data, null, 2);
-          })
-          .catch(err => {
-            console.error("Fetch error:", err);
-          });
-      };
-    </script>
-  </body>
+        <div class="search-bar">
+            <input type="text" placeholder="Search products…" id="searchInput">
+            <button>Search</button>
+        </div>
+
+        <div class="cart">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/shopping-cart.png"/>
+            <span id="cartCount">0</span>
+        </div>
+    </header>
+
+    <!-- Categories -->
+    <nav class="categories">
+        <a href="#">Electronics</a>
+        <a href="#">Clothing</a>
+        <a href="#">Home</a>
+        <a href="#">Games</a>
+        <a href="#">Fitness</a>
+        <a href="#">Automotive</a>
+        <a href="#">More</a>
+    </nav>
+
+    <!-- Product Grid -->
+    <section class="products" id="productGrid">
+        <!-- Products will be inserted by JavaScript -->
+    </section>
+
+    <script src="script.js"></script>
+</body>
 </html>
-
