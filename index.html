@@ -1,52 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShopClone — Amazon Style Store</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopClone — Amazon Style Store</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+    .header { display:flex; justify-content:space-between; align-items:center; padding:10px; background:#232f3e; color:white; }
+    .search-bar input { padding:5px; }
+    .categories { display:flex; gap:10px; padding:10px; background:#37475a; }
+    .categories a { color:white; text-decoration:none; }
+    .products { display:flex; flex-wrap:wrap; gap:10px; padding:10px; }
+    .product { border:1px solid #ccc; padding:10px; flex:1 1 150px; text-align:center; }
+    .product img { width:150px; height:150px; object-fit:cover; display:block; margin:0 auto 5px; }
+    .header-buttons { display:flex; align-items:center; gap:10px; }
+    .sign-in-btn { padding:5px 10px; background:#febd69; border:none; cursor:pointer; }
+</style>
 </head>
 <body>
 
-<!-- Header -->
 <header class="header">
-    <div class="top-bar">
-        <div class="location">Delivering to Orlando 32835</div>
-        <div class="account">
-            <span>Hello, sign in</span> | <span>Account & Lists</span>
-        </div>
-        <div class="orders">Returns & Orders</div>
-        <div class="cart">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/shopping-cart.png"/>
-            <span id="cartCount">0</span>
-        </div>
+    <div class="logo">
+        <a href="#" id="logoLink" style="color:white; text-decoration:none; font-weight:bold; font-size:24px;">ShopClone</a>
     </div>
-
-    <div class="logo-search">
-        <div class="logo"><a href="index.html" style="color:white; text-decoration:none;">ShopClone</a></div>
-        <div class="search-bar">
-            <input type="text" placeholder="Search products…" id="searchInput">
-            <button>Search</button>
+    <div class="search-bar" style="flex:1; margin:0 20px; display:flex; align-items:center;">
+        <input type="text" placeholder="Search products…" id="searchInput" style="flex:1; padding:6px 10px; font-size:14px; border:none; border-radius:4px 0 0 4px; height:32px;">
+        <button style="padding:8px 16px; font-size:14px; border:none; background:#febd69; cursor:pointer; border-radius:0 4px 4px 0; height:44px;">Search</button>
+    </div>
+    <div class="header-right" style="display:flex; gap:20px; align-items:center;">
+        <div class="account" style="text-align:center; cursor:pointer;">
+            <div style="font-size:12px;">Hello, Sign in</div>
+            <div style="font-weight:bold;">Account & Lists</div>
+        </div>
+        <div class="orders" style="text-align:center; cursor:pointer;">
+            <div style="font-size:12px;">Returns</div>
+            <div style="font-weight:bold;">& Orders</div>
+        </div>
+        <div class="cart" id="cartIcon" style="position:relative; cursor:pointer;">
+            <img src="https://img.icons8.com/ios-filled/50/ffffff/shopping-cart.png"/>
+            <span id="cartCount" style="position:absolute; top:-5px; right:-5px; background:red; border-radius:50%; padding:2px 6px; font-size:12px;">0</span>
         </div>
     </div>
 </header>
 
-<!-- Categories Navbar -->
 <nav class="categories">
-    <a href="./home.html">Home</a>
-    <a href="./electronics.html">Electronics</a>
-    <a href="./clothing.html">Clothing</a>
-    <a href="./games.html">Games</a>
-    <a href="./fitness.html">Fitness</a>
-    <a href="./automotive.html">Automotive</a>
-    <a href="./more.html">More</a>
+    <a href="#" data-category="electronics">Electronics</a>
+    <a href="#" data-category="clothing">Clothing</a>
+    <a href="#" data-category="games">Games</a>
+    <a href="#" data-category="fitness">Fitness</a>
+    <a href="#" data-category="automotive">Automotive</a>
+    <a href="#" data-category="more">More</a>
 </nav>
 
-<!-- Product Grid -->
-<section class="products" id="productGrid">
-    <!-- Products will be inserted by JavaScript -->
-</section>
+<section class="products" id="productGrid"></section>
 
-<script src="script.js"></script>
+<script>
+let cart = [];
+
+const productsData = {
+    home: [{name:"Welcome to ShopClone!", price:0, img:""}],
+    electronics: [
+        {name:"Laptop", price:899.99, images:["https://via.placeholder.com/150/0000FF","https://via.placeholder.com/150/FF0000","https://via.placeholder.com/150/00FF00"]},
+        {name:"Smartphone", price:399.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]},
+        {name:"Headphones", price:129.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]}
+    ],
+    clothing: [
+        {name:"T-Shirt", price:19.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]},
+        {name:"Jeans", price:49.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]}
+    ],
+    games: [
+        {name:"Console", price:399.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]}
+    ],
+    fitness: [
+        {name:"Dumbbells", price:49.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]}
+    ],
+    automotive: [
+    {name:"Car Oil", price:29.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]},
+    {name:"Tire", price:129.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]},
+    {name:"GPS Navigator", price:199.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]},
+    {name:"Car Cover", price:59.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]},
+    {name:"Car Battery", price:89.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]},
+    {name:"Car Vacuum", price:39.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]},
+    {name:"Windshield Wipers", price:24.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]}
+],
+
+    more: [
+        {name:"Books", price:14.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]}
+    ]
+};
+
+// Render products
+function renderProducts(category){
+    const grid = document.getElementById("productGrid");
+    grid.innerHTML = "";
+
+    if(!productsData[category]) return;
+
+    productsData[category].forEach(product => {
+        const div = document.createElement("div");
+        div.className = "product";
+
+        // Show first image
+        const img = document.createElement("img");
+        img.src = product.images ? product.images[0] : product.img;
+        div.appendChild(img);
+
+        // Name & Price
+        const name = document.createElement("h3");
+        name.textContent = product.name;
+        div.appendChild(name);
+
+        const price = document.createElement("p");
+        price.textContent = product.price ? `$${product.price}` : "";
+        div.appendChild(price);
+
+        // Add to Cart
+        const addBtn = document.createElement("button");
+        addBtn.textContent = "Add to Cart";
+        addBtn.onclick = () => {
+            cart.push(product);
+            document.getElementById("cartCount").textContent = cart.length;
+            alert(`${product.name} added to cart!`);
+        };
+        div.appendChild(addBtn);
+
+        // Buy Now
+        const buyBtn = document.createElement("button");
+        buyBtn.textContent = "Buy Now";
+        buyBtn.onclick = () => {
+            cart.push(product);
+            document.getElementById("cartCount").textContent = cart.length;
+            alert(`Buying ${product.name} for $${product.price}`);
+        };
+        div.appendChild(buyBtn);
+
+        grid.appendChild(div);
+    });
+}
+
+// Checkout page
+function renderCheckout(){
+    const grid = document.getElementById("productGrid");
+    grid.innerHTML = "";
+
+    if(cart.length === 0){
+        const div = document.createElement("div");
+        div.textContent = "Your cart is empty!";
+        grid.appendChild(div);
+        return;
+    }
+
+    cart.forEach(product => {
+        const div = document.createElement("div");
+        div.className = "product";
+
+        const img = document.createElement("img");
+        img.src = product.images ? product.images[0] : product.img;
+        div.appendChild(img);
+
+        const name = document.createElement("h3");
+        name.textContent = product.name;
+        div.appendChild(name);
+
+        const price = document.createElement("p");
+        price.textContent = `$${product.price}`;
+        div.appendChild(price);
+
+        grid.appendChild(div);
+    });
+}
+
+// Event listeners
+document.querySelectorAll(".categories a").forEach(link=>{
+    link.addEventListener("click", e=>{
+        e.preventDefault();
+        renderProducts(link.getAttribute("data-category"));
+    });
+});
+
+document.getElementById("logoLink").addEventListener("click", e=>{
+    e.preventDefault();
+    renderProducts("home");
+});
+
+document.getElementById("cartIcon").addEventListener("click", ()=>{
+    renderCheckout();
+});
+
+// Initial render
+renderProducts("electronics");
+</script>
 </body>
 </html>
