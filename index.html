@@ -48,6 +48,8 @@
     <a href="#" data-category="clothing">Clothing</a>
     <a href="#" data-category="games">Games</a>
     <a href="#" data-category="fitness">Fitness</a>
+     <a href="#" data-category="beauty">beauty</a>
+     <a href="#" data-category="health">health</a>
     <a href="#" data-category="automotive">Automotive</a>
     <a href="#" data-category="more">More</a>
 </nav>
@@ -73,6 +75,12 @@ const productsData = {
     ],
     fitness: [
         {name:"Dumbbells", price:49.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]}
+    ],
+    beauty: [
+        {name:"Lotion", price:49.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]}
+    ],
+    health: [
+        {name:"vitamins", price:49.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]}
     ],
     automotive: [
     {name:"Car Oil", price:29.99, images:["https://via.placeholder.com/150","https://via.placeholder.com/150","https://via.placeholder.com/150"]},
@@ -190,5 +198,25 @@ document.getElementById("cartIcon").addEventListener("click", ()=>{
 // Initial render
 renderProducts("electronics");
 </script>
+
+<!-- Main script -->
+<script>
+  document.getElementById("cartIcon").addEventListener("click", () => {
+      renderCheckout();
+  });
+
+  // Initial render
+  renderProducts("electronics");
+</script>
+
+<!-- Firebase module script -->
+<script type="module">
+  import { db } from './firebaseConfig.js';
+
+  console.log("Firebase connected!", db);
+
+  // You can now use `db` to fetch/store products dynamically instead of the hardcoded productsData
+</script>
+
 </body>
 </html>
