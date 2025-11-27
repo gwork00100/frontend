@@ -56,8 +56,16 @@
 
 <section class="products" id="productGrid"></section>
 
-<script>
+<!-- ✅ ONLY ONE SCRIPT. CLEAN. NO ERRORS. -->
+
+<!-- Firebase module script -->
+<script type="module">
+import { db } from './firebaseConfig.js';
+import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
 let cart = [];
+
+
 
 const productsData = {
     home: [{name:"Welcome to ShopClone!", price:0, img:""}],
@@ -97,126 +105,95 @@ const productsData = {
     ]
 };
 
+/* -------------------- RENDER PRODUCTS ----------------------- */
+
 // Render products
-function renderProducts(category){
+async function renderProducts(category) {
     const grid = document.getElementById("productGrid");
     grid.innerHTML = "";
 
-    if(!productsData[category]) return;
+    if (category === "home") {
+        grid.innerHTML = "<h2>Welcome to ShopClone!</h2>";
+        return;
+    }
 
-    productsData[category].forEach(product => {
-        const div = document.createElement("div");
-        div.className = "product";
+    try {
+        const q = query(collection(db, "products"), where("category", "==", category));
+        const snapshot = await getDocs(q);
 
-        // Show first image
-        const img = document.createElement("img");
-        img.src = product.images ? product.images[0] : product.img;
-        div.appendChild(img);
+        if (snapshot.empty) {
+            (productsData[category] || []).forEach(p => addProductToGrid(p, grid));
+            return;
+        }
 
-        // Name & Price
-        const name = document.createElement("h3");
-        name.textContent = product.name;
-        div.appendChild(name);
+        snapshot.forEach(doc => addProductToGrid(doc.data(), grid));
 
-        const price = document.createElement("p");
-        price.textContent = product.price ? `$${product.price}` : "";
-        div.appendChild(price);
+    } catch (err) {
+        console.error(err);
+        grid.innerHTML = "<p>Error loading products.</p>";
+    }
+}
+/* -------------------- ADD PRODUCT CARD ----------------------- */
+function addProductToGrid(product, grid) {
+    const div = document.createElement("div");
+    div.className = "product";
 
-        // Add to Cart
-        const addBtn = document.createElement("button");
-        addBtn.textContent = "Add to Cart";
-        addBtn.onclick = () => {
-            cart.push(product);
-            document.getElementById("cartCount").textContent = cart.length;
-            alert(`${product.name} added to cart!`);
-        };
-        div.appendChild(addBtn);
+    div.innerHTML = `
+        <img src="${product.images?.[0] || ''}">
+        <h3>${product.name}</h3>
+        <p>$${product.price}</p>
+        <button class="addBtn">Add to Cart</button>
+        <button class="buyBtn">Buy Now</button>
+    `;
 
-        // Buy Now
-        const buyBtn = document.createElement("button");
-        buyBtn.textContent = "Buy Now";
-        buyBtn.onclick = () => {
-            cart.push(product);
-            document.getElementById("cartCount").textContent = cart.length;
-            alert(`Buying ${product.name} for $${product.price}`);
-        };
-        div.appendChild(buyBtn);
+    div.querySelector(".addBtn").onclick = () => {
+        cart.push(product);
+        document.getElementById("cartCount").innerText = cart.length;
+    };
 
-        grid.appendChild(div);
-    });
+    div.querySelector(".buyBtn").onclick = () => {
+        alert(`Buying ${product.name}`);
+    };
+
+    grid.appendChild(div);
 }
 
-// Checkout page
-function renderCheckout(){
+/* -------------------- CHECKOUT ----------------------- */
+function renderCheckout() {
     const grid = document.getElementById("productGrid");
-    grid.innerHTML = "";
+    grid.innerHTML = "<h2>Your Cart</h2>";
 
-    if(cart.length === 0){
-        const div = document.createElement("div");
-        div.textContent = "Your cart is empty!";
-        grid.appendChild(div);
+    if (!cart.length) {
+        grid.innerHTML += "<p>Cart is empty.</p>";
         return;
     }
 
     cart.forEach(product => {
         const div = document.createElement("div");
         div.className = "product";
-
-        const img = document.createElement("img");
-        img.src = product.images ? product.images[0] : product.img;
-        div.appendChild(img);
-
-        const name = document.createElement("h3");
-        name.textContent = product.name;
-        div.appendChild(name);
-
-        const price = document.createElement("p");
-        price.textContent = `$${product.price}`;
-        div.appendChild(price);
-
+        div.innerHTML = `
+            <img src="${product.images?.[0]}">
+            <h3>${product.name}</h3>
+            <p>$${product.price}</p>
+        `;
         grid.appendChild(div);
     });
 }
 
-// Event listeners
-document.querySelectorAll(".categories a").forEach(link=>{
-    link.addEventListener("click", e=>{
+/* -------------------- EVENTS ----------------------- */
+document.querySelectorAll(".categories a").forEach(link => {
+    link.addEventListener("click", e => {
         e.preventDefault();
-        renderProducts(link.getAttribute("data-category"));
+        renderProducts(link.dataset.category);
     });
 });
 
-document.getElementById("logoLink").addEventListener("click", e=>{
-    e.preventDefault();
-    renderProducts("home");
-});
+document.getElementById("logoLink").onclick = () => renderProducts("home");
+document.getElementById("cartIcon").onclick = () => renderCheckout();
 
-document.getElementById("cartIcon").addEventListener("click", ()=>{
-    renderCheckout();
-});
-
-// Initial render
 renderProducts("electronics");
-</script>
-
-<!-- Main script -->
-<script>
-  document.getElementById("cartIcon").addEventListener("click", () => {
-      renderCheckout();
-  });
-
-  // Initial render
-  renderProducts("electronics");
-</script>
-
-<!-- Firebase module script -->
-<script type="module">
-  import { db } from './firebaseConfig.js';
-
-  console.log("Firebase connected!", db);
-
-  // You can now use `db` to fetch/store products dynamically instead of the hardcoded productsData
 </script>
 
 </body>
 </html>
+
