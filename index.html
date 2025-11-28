@@ -43,6 +43,35 @@
     </div>
 </header>
 
+<div id="authBox" style="padding:15px; background:#fff3cd; display:none;">
+    <h3>Sign In</h3>
+
+    <button id="googleLogin" 
+        style="padding:8px; background:#4285F4; color:white; border:none; cursor:pointer;">
+        Sign in with Google
+    </button>
+
+    <br><br>
+
+    <input id="emailInput" type="email" placeholder="Email"
+        style="padding:8px; width:200px;"><br><br>
+
+    <input id="passwordInput" type="password" placeholder="Password"
+        style="padding:8px; width:200px;"><br><br>
+
+    <button id="emailLogin" style="padding:8px; background:#febd69; border:none; cursor:pointer;">
+        Sign in with Email
+    </button>
+
+    <button id="emailSignup" style="padding:8px; background:#ffa41c; border:none; cursor:pointer;">
+        Create Account
+    </button>
+
+    <br><br>
+    <button id="closeAuth" style="padding:5px;">Close</button>
+</div>
+
+
 <nav class="categories">
     <a href="#" data-category="electronics">Electronics</a>
     <a href="#" data-category="clothing">Clothing</a>
@@ -61,6 +90,82 @@
 import { db, auth } from './firebaseConfig.js';
 import { collection, query, where, getDocs, doc, setDoc, getDoc } 
     from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+
+
+
+/* -------------------- AUTH IMPORTS (ADD THESE) ----------------------- */
+import { 
+    GoogleAuthProvider, signInWithPopup,
+    signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+
+/* -------------------- AUTH BUTTON LOGIC (ADD THIS) ----------------------- */
+
+// Open login popup
+document.querySelector(".account").onclick = () => {
+    document.getElementById("authBox").style.display = "block";
+};
+
+// Close login popup
+document.getElementById("closeAuth").onclick = () => {
+    document.getElementById("authBox").style.display = "none";
+};
+
+// GOOGLE LOGIN
+document.getElementById("googleLogin").onclick = async () => {
+    try {
+        await signInWithPopup(auth, new GoogleAuthProvider());
+        alert("Logged in with Google!");
+        document.getElementById("authBox").style.display = "none";
+        await loadCartFromFirebase();
+    } catch (e) {
+        alert(e.message);
+    }
+};
+
+// EMAIL LOGIN
+document.getElementById("emailLogin").onclick = async () => {
+    const email = emailInput.value;
+    const pass = passwordInput.value;
+
+    try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        alert("Logged in!");
+        document.getElementById("authBox").style.display = "none";
+        await loadCartFromFirebase();
+    } catch (e) {
+        alert(e.message);
+    }
+};
+
+// EMAIL SIGNUP
+document.getElementById("emailSignup").onclick = async () => {
+    const email = emailInput.value;
+    const pass = passwordInput.value;
+
+    try {
+        await createUserWithEmailAndPassword(auth, email, pass);
+        alert("Account created!");
+        document.getElementById("authBox").style.display = "none";
+    } catch (e) {
+        alert(e.message);
+    }
+};
+
+// LOGOUT on right-click
+document.querySelector(".account").oncontextmenu = async e => {
+    e.preventDefault();
+    await signOut(auth);
+    alert("Logged out!");
+    cart = [];
+    document.getElementById("cartCount").innerText = 0;
+};
+
+
+
+/* -------------------- YOUR EXISTING CODE CONTINUES BELOW ----------------------- */
 
 let cart = [];
 let currentUser = null;
