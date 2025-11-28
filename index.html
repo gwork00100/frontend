@@ -56,14 +56,14 @@
 
 <section class="products" id="productGrid"></section>
 
-<!-- ✅ ONLY ONE SCRIPT. CLEAN. NO ERRORS. -->
-
-<!-- Firebase module script -->
 <script type="module">
-import { db } from './firebaseConfig.js';
-import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+/* -------------------- IMPORTS ----------------------- */
+import { db, auth } from './firebaseConfig.js';
+import { collection, query, where, getDocs, doc, setDoc, getDoc } 
+    from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 let cart = [];
+let currentUser = null;
 
 
 
@@ -105,9 +105,46 @@ const productsData = {
     ]
 };
 
+
+
+
+/* -------------------- LOGIN STATE TRACKING ----------------------- */
+auth.onAuthStateChanged(async user => {
+    currentUser = user;
+
+    if (user) {
+        console.log("User logged in:", user.uid);
+        await loadCartFromFirebase();
+    } else {
+        console.log("No user logged in");
+    }
+});
+
+
+/* -------------------- SAVE CART TO FIREBASE ----------------------- */
+async function saveCartToFirebase() {
+    if (!currentUser) return;
+    await setDoc(doc(db, "carts", currentUser.uid), {
+        items: cart
+    });
+}
+
+
+
+/* -------------------- LOAD CART FROM FIREBASE ----------------------- */
+async function loadCartFromFirebase() {
+    if (!currentUser) return;
+    const ref = doc(db, "carts", currentUser.uid);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+        cart = snap.data().items;
+        document.getElementById("cartCount").innerText = cart.length;
+    }
+}
+
 /* -------------------- RENDER PRODUCTS ----------------------- */
 
-// Render products
 async function renderProducts(category) {
     const grid = document.getElementById("productGrid");
     grid.innerHTML = "";
@@ -120,11 +157,6 @@ async function renderProducts(category) {
     try {
         const q = query(collection(db, "products"), where("category", "==", category));
         const snapshot = await getDocs(q);
-
-        if (snapshot.empty) {
-            (productsData[category] || []).forEach(p => addProductToGrid(p, grid));
-            return;
-        }
 
         snapshot.forEach(doc => addProductToGrid(doc.data(), grid));
 
@@ -146,9 +178,10 @@ function addProductToGrid(product, grid) {
         <button class="buyBtn">Buy Now</button>
     `;
 
-    div.querySelector(".addBtn").onclick = () => {
+    div.querySelector(".addBtn").onclick = async () => {
         cart.push(product);
         document.getElementById("cartCount").innerText = cart.length;
+        await saveCartToFirebase(); // <-- ADDED
     };
 
     div.querySelector(".buyBtn").onclick = () => {
