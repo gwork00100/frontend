@@ -5,17 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ShopClone — Amazon Style Store</title>
 <link rel="stylesheet" href="styles.css">
-<style>
-    .header { display:flex; justify-content:space-between; align-items:center; padding:10px; background:#232f3e; color:white; }
-    .search-bar input { padding:5px; }
-    .categories { display:flex; gap:10px; padding:10px; background:#37475a; }
-    .categories a { color:white; text-decoration:none; }
-    .products { display:flex; flex-wrap:wrap; gap:10px; padding:10px; }
-    .product { border:1px solid #ccc; padding:10px; flex:1 1 150px; text-align:center; }
-    .product img { width:150px; height:150px; object-fit:cover; display:block; margin:0 auto 5px; }
-    .header-buttons { display:flex; align-items:center; gap:10px; }
-    .sign-in-btn { padding:5px 10px; background:#febd69; border:none; cursor:pointer; }
-</style>
+
 </head>
 <body>
 
@@ -28,10 +18,25 @@
         <button style="padding:8px 16px; font-size:14px; border:none; background:#febd69; cursor:pointer; border-radius:0 4px 4px 0; height:44px;">Search</button>
     </div>
     <div class="header-right" style="display:flex; gap:20px; align-items:center;">
-        <div class="account" style="text-align:center; cursor:pointer;">
-            <div style="font-size:12px;">Hello, Sign in</div>
-            <div style="font-weight:bold;">Account & Lists</div>
-        </div>
+        <div class="account" id="accountBox" style="position:relative; text-align:center; cursor:pointer;">
+    <div id="accountHello" style="font-size:12px;">Hello, Sign in</div>
+    <div id="accountMain" style="font-weight:bold;">Account & Lists ▼</div>
+
+    <!-- Dropdown -->
+    <div id="accountMenu" 
+         style="display:none; position:absolute; right:0; top:40px; background:white; color:black;
+                border:1px solid #ccc; width:180px; padding:10px;">
+
+        <div id="accountEmail" style="font-size:14px; margin-bottom:10px; display:none;"></div>
+
+        <button id="logoutBtn" 
+            style="width:100%; padding:6px; background:#ff4b4b; color:white;
+                   border:none; cursor:pointer; display:none;">
+            Logout
+        </button>
+    </div>
+</div>
+
         <div class="orders" style="text-align:center; cursor:pointer;">
             <div style="font-size:12px;">Returns</div>
             <div style="font-weight:bold;">& Orders</div>
@@ -214,16 +219,43 @@ const productsData = {
 
 
 /* -------------------- LOGIN STATE TRACKING ----------------------- */
+
 auth.onAuthStateChanged(async user => {
     currentUser = user;
 
+    const hello = document.getElementById("accountHello");
+    const emailBox = document.getElementById("accountEmail");
+    const logoutBtn = document.getElementById("logoutBtn");
+
     if (user) {
+        // Logged in
+        hello.innerText = `Hello, ${user.email.split("@")[0]}`;
+        emailBox.innerText = user.email;
+        emailBox.style.display = "block";
+        logoutBtn.style.display = "block";
+
         console.log("User logged in:", user.uid);
         await loadCartFromFirebase();
+
     } else {
+        // Logged out
+        hello.innerText = "Hello, Sign in";
+        emailBox.style.display = "none";
+        logoutBtn.style.display = "none";
+
+        cart = [];
+        document.getElementById("cartCount").innerText = 0;
+
         console.log("No user logged in");
     }
 });
+// LOGOUT BUTTON
+document.getElementById("logoutBtn").onclick = async () => {
+    await signOut(auth);
+    alert("You have been logged out.");
+};
+
+
 
 
 /* -------------------- SAVE CART TO FIREBASE ----------------------- */
@@ -319,17 +351,7 @@ function renderCheckout() {
 }
 
 /* -------------------- EVENTS ----------------------- */
-document.querySelectorAll(".categories a").forEach(link => {
-    link.addEventListener("click", e => {
-        e.preventDefault();
-        renderProducts(link.dataset.category);
-    });
-});
 
-document.getElementById("logoLink").onclick = () => renderProducts("home");
-document.getElementById("cartIcon").onclick = () => renderCheckout();
-
-renderProducts("electronics");
 </script>
 
 </body>
