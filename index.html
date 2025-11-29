@@ -293,22 +293,24 @@ async function renderProducts(category) {
     const grid = document.getElementById("productGrid");
     grid.innerHTML = "";
 
-    if (category === "home") {
-        grid.innerHTML = "<h2>Welcome to ShopClone!</h2>";
-        return;
-    }
-
     try {
         const q = query(collection(db, "products"), where("category", "==", category));
         const snapshot = await getDocs(q);
 
+        console.log("Category:", category);
+        console.log("Firestore docs:", snapshot.docs.map(d => d.data()));
+
         snapshot.forEach(doc => addProductToGrid(doc.data(), grid));
 
+        if (snapshot.empty) {
+            grid.innerHTML = "<p>No products found in this category.</p>";
+        }
     } catch (err) {
         console.error(err);
         grid.innerHTML = "<p>Error loading products.</p>";
     }
 }
+
 /* -------------------- ADD PRODUCT CARD ----------------------- */
 function addProductToGrid(product, grid) {
     const div = document.createElement("div");
