@@ -115,10 +115,18 @@ const passwordInput = document.getElementById("passwordInput");
 
 /* -------------------- AUTH BUTTON LOGIC (ADD THIS) ----------------------- */
 
-// Open login popup
-document.querySelector(".account").onclick = () => {
-    document.getElementById("authBox").style.display = "block";
+// ACCOUNT BOX CLICK (Login OR Dropdown)
+document.getElementById("accountBox").onclick = () => {
+    if (currentUser) {
+        // User is logged in → toggle dropdown
+        const menu = document.getElementById("accountMenu");
+        menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    } else {
+        // User is logged out → open login popup
+        document.getElementById("authBox").style.display = "block";
+    }
 };
+
 
 // Close login popup
 document.getElementById("closeAuth").onclick = () => {
@@ -136,6 +144,8 @@ document.getElementById("googleLogin").onclick = async () => {
         alert(e.message);
     }
 };
+
+
 
 // EMAIL LOGIN
 document.getElementById("emailLogin").onclick = async () => {
