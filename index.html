@@ -152,10 +152,15 @@ document.getElementById("emailLogin").onclick = async () => {
     }
 };
 
-// EMAIL SIGNUP
+// EMAIL SIGNUP (FIXED)
 document.getElementById("emailSignup").onclick = async () => {
-    const email = emailInput.value;
-    const pass = passwordInput.value;
+    const email = emailInput.value.trim();
+    const pass = passwordInput.value.trim();
+
+    if (!email || !pass) {
+        alert("Please enter a valid email and password.");
+        return;
+    }
 
     try {
         await createUserWithEmailAndPassword(auth, email, pass);
@@ -165,6 +170,7 @@ document.getElementById("emailSignup").onclick = async () => {
         alert(e.message);
     }
 };
+
 
 // LOGOUT on right-click
 document.querySelector(".account").oncontextmenu = async e => {
