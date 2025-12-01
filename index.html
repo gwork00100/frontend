@@ -82,8 +82,8 @@
     <a href="#" data-category="clothing">Clothing</a>
     <a href="#" data-category="games">Games</a>
     <a href="#" data-category="fitness">Fitness</a>
-     <a href="#" data-category="beauty">beauty</a>
-     <a href="#" data-category="health">health</a>
+     <a href="#" data-category="beauty">Beauty</a>
+     <a href="#" data-category="health">Health</a>
     <a href="#" data-category="automotive">Automotive</a>
     <a href="#" data-category="more">More</a>
 </nav>
@@ -385,6 +385,18 @@ document.querySelectorAll(".categories a").forEach(link => {
         renderProducts(category); // Call your function to populate products
     };
 });
+
+/* -------------------- CART & ORDERS CLICK HANDLERS ----------------------- */
+// Cart icon → open checkout
+document.getElementById("cartIcon").onclick = () => {
+    renderCheckout();
+};
+
+// Returns / Orders → open checkout
+document.querySelector(".orders").onclick = () => {
+    renderCheckout();
+};
+
 
 
 </script>
