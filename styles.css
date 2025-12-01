@@ -223,3 +223,19 @@ button {
         margin: 10px 0;
     }
 }
+/* -------------------- ACCOUNT / AUTH HOVER -------------------- */
+#cartIcon,
+.orders {
+    position: relative;
+    z-index: 5000;
+}
+
+#accountMenu {
+    z-index: 100;
+    pointer-events: auto;
+}
+
+
+#accountMenu button:hover {
+    background: #e60000;
+}
