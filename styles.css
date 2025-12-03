@@ -315,6 +315,14 @@ button {
     }
 }
 
+
+/* -------------------- HIDE RETURNS & ORDERS ON MOBILE -------------------- */
+@media (max-width: 768px) {
+    .returns-orders {
+        display: none;
+    }
+}
+
 /* -------------------- DESKTOP -------------------- */
 @media (min-width: 769px) {
     /* Hide mobile sidebar and hamburger */
