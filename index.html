@@ -6,47 +6,78 @@
 <title>PrimeShift — Amazon Style Store</title>
 <link rel="stylesheet" href="styles.css">
 
+<script src="https://js.stripe.com/v3/"></script>
+
+
 </head>
 <body>
 
 <header class="header">
+
+    <div class="hamburger" id="hamburgerMenu">
+    &#9776; <!-- This is the 3-bar icon -->
+</div>
+
+
     <div class="logo">
         <a href="#" id="logoLink" style="color:white; text-decoration:none; font-weight:bold; font-size:24px;">PrimeShift</a>
     </div>
-    <div class="search-bar" style="flex:1; margin:0 20px; display:flex; align-items:center;">
+    <div class="search-bar">
+
         <input type="text" placeholder="Search products…" id="searchInput" style="flex:1; padding:6px 10px; font-size:14px; border:none; border-radius:4px 0 0 4px; height:32px;">
         <button style="padding:8px 16px; font-size:14px; border:none; background:#febd69; cursor:pointer; border-radius:0 4px 4px 0; height:44px;">Search</button>
     </div>
-    <div class="header-right" style="display:flex; gap:20px; align-items:center;">
-        <div class="account" id="accountBox" style="position:relative; text-align:center; cursor:pointer;">
-    <div id="accountHello" style="font-size:12px;">Hello, Sign in</div>
-    <div id="accountMain" style="font-weight:bold;">Account & Lists ▼</div>
-
-    <!-- Dropdown -->
-    <div id="accountMenu" 
-         style="display:none; position:absolute; right:0; top:40px; background:white; color:black;
-                border:1px solid #ccc; width:180px; padding:10px;">
-
-        <div id="accountEmail" style="font-size:14px; margin-bottom:10px; display:none;"></div>
-
-        <button id="logoutBtn" 
-            style="width:100%; padding:6px; background:#ff4b4b; color:white;
-                   border:none; cursor:pointer; display:none;">
-            Logout
-        </button>
+<div class="header-right">
+    <div class="account" id="accountBox">
+        <div id="accountHello">Hello, Sign in</div>
+        <div id="accountMain">Account & Lists ▼</div>
+        <!-- Dropdown -->
+        <div id="accountMenu">
+            <div id="accountEmail"></div>
+            <button id="logoutBtn">Logout</button>
+        </div>
+    </div>
+    <div class="orders">
+        <div>Returns</div>
+        <div>& Orders</div>
+    </div>
+    <div class="cart" id="cartIcon">
+        <img src="https://img.icons8.com/ios-filled/50/ffffff/shopping-cart.png"/>
+        <span id="cartCount">0</span>
     </div>
 </div>
 
-        <div class="orders" style="text-align:center; cursor:pointer;">
-            <div style="font-size:12px;">Returns</div>
-            <div style="font-weight:bold;">& Orders</div>
-        </div>
-        <div class="cart" id="cartIcon" style="position:relative; cursor:pointer;">
-            <img src="https://img.icons8.com/ios-filled/50/ffffff/shopping-cart.png"/>
-            <span id="cartCount" style="position:absolute; top:-5px; right:-5px; background:red; border-radius:50%; padding:2px 6px; font-size:12px;">0</span>
-        </div>
+</div>
+
+        
     </div>
 </header>
+
+
+
+
+<!-- ✅ Sidebar goes here -->
+<div id="mobileSidebar">
+    <button id="closeSidebar">&times;</button>
+    <div class="sidebar-content">
+        <a href="#" id="mobileSignIn">Sign In</a>
+        <a href="#">Browse Products</a>
+        <a href="#">Home</a>
+        <hr>
+        <h4>Trending</h4>
+        <a href="#">Best Sellers</a>
+        <a href="#">New Releases</a>
+        <a href="#">Movers & Shakers</a>
+        <hr>
+        <h4>Top Departments</h4>
+        <a href="#">Electronics</a>
+        <a href="#">Clothing</a>
+        <a href="#">Games</a>
+        <a href="#">Fitness</a>
+    </div>
+</div>
+
+<!-- Your auth box starts here -->
 
 <div id="authBox" style="padding:15px; background:#fff3cd; display:none;">
     <h3>Sign In</h3>
@@ -90,6 +121,9 @@
 
 <section class="products" id="productGrid"></section>
 
+
+
+
 <script type="module">
 
     
@@ -97,6 +131,35 @@
 import { db, auth } from './firebaseConfig.js';
 import { collection, query, where, getDocs, doc, setDoc, getDoc } 
     from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+    /* -------------------- MOBILE SIDEBAR TOGGLE -------------------- */
+
+
+const hamburger = document.getElementById("hamburgerMenu");
+const mobileSidebar = document.getElementById("mobileSidebar");
+const closeSidebar = document.getElementById("closeSidebar");
+
+hamburger.addEventListener("click", () => {
+    console.log("HAMBURGER CLICKED"); // Debug
+    mobileSidebar.style.transform = "translateX(0)";
+});
+
+closeSidebar.addEventListener("click", () => {
+    console.log("CLOSE CLICKED"); // Debug
+    mobileSidebar.style.transform = "translateX(-100%)";
+});
+
+// Close when clicking outside
+document.addEventListener("click", (e) => {
+    if (
+        !mobileSidebar.contains(e.target) &&
+        !hamburger.contains(e.target)
+    ) {
+        mobileSidebar.style.transform = "translateX(-100%)";
+    }
+});
+
+
 
 
 
@@ -438,8 +501,11 @@ function renderCheckout() {
         btn.onclick = () => removeItem(btn.dataset.id)
     );
 
-    // Checkout button → open checkout page
-    document.getElementById("proceedCheckoutBtn").onclick = renderCheckoutPage;
+    // Checkout button → go to checkout.html
+document.getElementById("proceedCheckoutBtn").onclick = () => {
+    window.location.href = "checkout.html";
+};
+
 }
 
 

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PrimeShift Checkout</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="checkout.css">
+
+  <!-- Stripe -->
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+
+<div class="checkout-container">
+
+  <!-- LEFT COLUMN -->
+  <div class="left-column">
+
+    <!-- SHIPPING ADDRESS -->
+    <div class="section">
+      <h2>1. Shipping Address</h2>
+      <input id="fullName" placeholder="Full Name">
+      <input id="address1" placeholder="Address Line 1">
+      <input id="address2" placeholder="Address Line 2 (optional)">
+      <input id="city" placeholder="City">
+      <input id="state" placeholder="State">
+      <input id="zip" placeholder="ZIP Code">
+    </div>
+
+    <!-- DELIVERY OPTIONS -->
+    <div class="section">
+      <h2>2. Delivery Options</h2>
+      <label><input type="radio" name="delivery" value="standard" checked> Free Standard Delivery (5–7 days)</label><br>
+      <label><input type="radio" name="delivery" value="fast"> Faster Delivery ($4.99)</label><br>
+      <label><input type="radio" name="delivery" value="expedited"> Expedited Delivery ($12.99)</label>
+    </div>
+
+    <!-- PAYMENT METHOD -->
+    <div class="section">
+      <h2>3. Payment Method</h2>
+
+      <!-- Card -->
+      <label>
+        <input type="radio" name="payMethod" value="card" checked>
+        Pay with Card
+      </label>
+      <div id="card-section" style="margin-top:10px;">
+        <div id="card-element"></div>
+      </div>
+
+      <!-- Crypto -->
+      <label>
+        <input type="radio" name="payMethod" value="crypto">
+        Pay with Crypto (Wallet)
+      </label>
+      <div id="crypto-section" style="display:none; margin-top:10px;">
+        <input id="walletAddress" placeholder="Enter Your Wallet Address">
+        <button id="cryptoPayBtn">I’ve Paid</button>
+        <p id="cryptoMsg" style="color:green;"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="right-column">
+    <h2>Order Summary</h2>
+    <div id="orderSummary"></div>
+    <button id="placeOrderBtn">Place Order</button>
+  </div>
+
+</div>
+
+<script type="module">
+import { auth, db } from "./firebaseConfig.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+/* ---------------- Stripe Setup ---------------- */
+const stripe = Stripe("YOUR_PUBLIC_KEY"); // <-- Replace with your key
+const elements = stripe.elements();
+const card = elements.create("card");
+card.mount("#card-element");
+
+let cart = [];
+let userId = null;
+
+/* ---------------- Load Cart & User ---------------- */
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    alert("You must sign in first.");
+    window.location.href = "index.html";
+    return;
+  }
+  userId = user.uid;
+
+  const cartRef = doc(db, "carts", userId);
+  const snap = await getDoc(cartRef);
+  if (snap.exists()) cart = snap.data().items || [];
+  updateOrderSummary();
+});
+
+/* ---------------- Order Summary ---------------- */
+function updateOrderSummary() {
+  let subtotal = cart.reduce((acc, item) => acc + item.price, 0);
+  let delivery = 0;
+  const method = document.querySelector("input[name='delivery']:checked").value;
+  if (method === "fast") delivery = 4.99;
+  if (method === "expedited") delivery = 12.99;
+  const total = subtotal + delivery;
+
+  document.getElementById("orderSummary").innerHTML = `
+    Items: $${subtotal.toFixed(2)}<br>
+    Delivery: $${delivery.toFixed(2)}<br>
+    <hr>
+    <strong>Total: $${total.toFixed(2)}</strong>
+  `;
+}
+document.querySelectorAll("input[name='delivery']").forEach(r => r.onclick = updateOrderSummary);
+
+/* ---------------- Payment Method Toggle ---------------- */
+const cardSection = document.getElementById("card-section");
+const cryptoSection = document.getElementById("crypto-section");
+document.querySelectorAll("input[name='payMethod']").forEach(radio => {
+  radio.addEventListener("change", () => {
+    if (radio.value === "card") {
+      cardSection.style.display = "block";
+      cryptoSection.style.display = "none";
+    } else {
+      cardSection.style.display = "none";
+      cryptoSection.style.display = "block";
+    }
+  });
+});
+
+/* ---------------- Stripe Card Checkout ---------------- */
+document.getElementById("placeOrderBtn").onclick = async () => {
+  const payMethod = document.querySelector("input[name='payMethod']:checked").value;
+
+  let subtotal = cart.reduce((acc, item) => acc + item.price, 0);
+  let delivery = 0;
+  const method = document.querySelector("input[name='delivery']:checked").value;
+  if (method === "fast") delivery = 4.99;
+  if (method === "expedited") delivery = 12.99;
+  const total = subtotal + delivery;
+  const amount = Math.round(total * 100);
+
+  if (payMethod === "card") {
+    // Create Stripe PaymentIntent
+    const res = await fetch("http://localhost:4000/create-payment-intent", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ amount, userId, cartItems: cart })
+    });
+    const data = await res.json();
+
+    // Confirm Card Payment
+    const result = await stripe.confirmCardPayment(data.clientSecret, { payment_method: { card } });
+    if (result.error) return alert(result.error.message);
+
+    if (result.paymentIntent.status === "requires_capture") {
+      alert("Order placed! Your card is authorized, not charged yet.");
+      window.location.href = "/order-success.html";
+    }
+  }
+};
+
+/* ---------------- Crypto Wallet Payment ---------------- */
+document.getElementById("cryptoPayBtn").onclick = async () => {
+  const wallet = document.getElementById("walletAddress").value.trim();
+  if (!wallet) return alert("Enter your wallet address");
+
+  let subtotal = cart.reduce((acc, item) => acc + item.price, 0);
+  const method = document.querySelector("input[name='delivery']:checked").value;
+  let delivery = 0;
+  if (method === "fast") delivery = 4.99;
+  if (method === "expedited") delivery = 12.99;
+  const total = subtotal + delivery;
+
+  // Send wallet + amount + userId + cart to backend
+  const res = await fetch("http://localhost:4000/create-crypto-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ wallet, amount: total, userId, cartItems: cart })
+  });
+  const data = await res.json();
+
+  const msg = document.getElementById("cryptoMsg");
+  if (data.success) {
+    msg.innerText = `Invoice generated. TXID: ${data.txId}. We'll verify and confirm your order shortly.`;
+  } else {
+    msg.innerText = `Error: ${data.error}`;
+  }
+};
+</script>
+
+</body>
+</html>

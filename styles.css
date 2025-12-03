@@ -7,28 +7,31 @@ body {
 
 button {
     font-family: inherit;
+    cursor: pointer;
 }
 
 /* -------------------- HEADER -------------------- */
 .header {
     background: #131921;
-    height: 60px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 0 20px;
+    height: 60px;
     color: white;
     position: relative;
+    z-index: 1000;
 }
 
 .logo {
     font-size: 24px;
     font-weight: bold;
-    margin-right: 30px;
 }
 
 .search-bar {
     flex: 1;
     display: flex;
+    margin: 0 20px;
 }
 
 .search-bar input {
@@ -42,7 +45,6 @@ button {
     padding: 10px 20px;
     border: none;
     background: #febd69;
-    cursor: pointer;
     font-weight: bold;
     border-radius: 0 4px 4px 0;
     transition: background 0.2s;
@@ -55,7 +57,6 @@ button {
 .cart {
     position: relative;
     margin-left: 20px;
-    cursor: pointer;
 }
 
 .cart img {
@@ -72,11 +73,10 @@ button {
     right: -10px;
 }
 
-/* -------------------- ACCOUNT / AUTH -------------------- */
+/* -------------------- ACCOUNT DROPDOWN -------------------- */
 .account {
     position: relative;
     margin-left: 20px;
-    cursor: pointer;
     text-align: center;
 }
 
@@ -95,18 +95,14 @@ button {
     z-index: 100;
 }
 
-#accountMenu button {
+#logoutBtn {
     width: 100%;
     padding: 6px;
-    margin-top: 5px;
-    border: none;
-    cursor: pointer;
-    border-radius: 3px;
-}
-
-#logoutBtn {
     background: #ff4b4b;
     color: white;
+    border: none;
+    border-radius: 3px;
+    margin-top: 5px;
 }
 
 /* -------------------- AUTH POPUP -------------------- */
@@ -120,7 +116,7 @@ button {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    z-index: 200;
+    z-index: 2000;
 }
 
 #authBox button {
@@ -128,26 +124,8 @@ button {
     width: 100%;
     padding: 10px;
     border: none;
-    cursor: pointer;
     border-radius: 4px;
     font-weight: bold;
-}
-
-#googleLogin {
-    background: #4285F4;
-    color: white;
-}
-
-#emailLogin {
-    background: #febd69;
-}
-
-#emailSignup {
-    background: #ffa41c;
-}
-
-#closeAuth {
-    background: #ccc;
 }
 
 /* -------------------- CATEGORIES -------------------- */
@@ -179,63 +157,218 @@ button {
     gap: 20px;
 }
 
-.product-card, .product {
+.product {
     background: white;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 0 5px rgba(0,0,0,0.2);
     text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
 }
 
-.product-card img, .product img {
-    width: 100%;
-    height: 180px;
-    object-fit: contain;
-}
-
-.product-card button, .product button {
-    background: #f08804;
-    border: none;
-    padding: 10px;
-    width: 100%;
+/* -------------------- HAMBURGER -------------------- */
+.hamburger {
+    display: none;
+    font-size: 28px;
     cursor: pointer;
-    font-weight: bold;
-    margin-top: 10px;
-    border-radius: 4px;
-    transition: background 0.2s;
+    z-index: 6000; /* always above sidebar */
+    position: relative;
 }
 
-.product-card button:hover, .product button:hover {
-    background: #f3a847;
+/* -------------------- MOBILE SIDEBAR -------------------- */
+#mobileSidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background: #232f3e;
+    color: white;
+    padding: 20px;
+
+    transform: translateX(-100%); /* hidden by default */
+    transition: transform 0.3s ease;
+
+    z-index: 2000;
 }
 
-/* -------------------- RESPONSIVE -------------------- */
+
+
+
+#mobileSidebar a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 10px 0;
+}
+
+#mobileSidebar a:hover {
+    color: #febd69;
+}
+
+#closeSidebar {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
 @media (max-width: 768px) {
     .header {
-        flex-direction: column;
-        height: auto;
-        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap; /* keep one row for top items */
+        padding: 10px 15px;
     }
+
+    .hamburger {
+        display: block;
+        order: 1;
+        font-size: 28px;
+    }
+
+    .logo {
+        order: 2;
+        flex: none; /* do NOT stretch */
+        margin-left: 10px; /* hug hamburger */
+        font-size: 20px;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        order: 3;
+        margin-left: auto; /* push to right */
+    }
+
     .search-bar {
-        margin: 10px 0;
+        order: 4;
+        flex-basis: 100%;
+        width: 100%;
+        margin: 10px 0 0 0;
+        display: flex;
+    }
+
+    .search-bar input {
+        flex: 1;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    .search-bar button {
+        padding: 10px 16px;
+        font-size: 16px;
     }
 }
-/* -------------------- ACCOUNT / AUTH HOVER -------------------- */
-#cartIcon,
-.orders {
-    position: relative;
-    z-index: 5000;
+@media (max-width: 768px) {
+
+    .header {
+        display: flex;
+        flex-wrap: wrap;       /* allow multiple rows */
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 15px;
+        height: auto;
+    }
+
+    .hamburger {
+        display: block;
+        order: 1;
+        font-size: 28px;
+    }
+
+    .logo {
+        flex: 1;
+        text-align: center;
+        order: 2;
+        font-size: 20px;
+    }
+
+    .header-right {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-left: auto; /* keeps them hugging the right */
 }
 
-#accountMenu {
-    z-index: 100;
-    pointer-events: auto;
+
+    .search-bar {
+        order: 4;
+        flex-basis: 100%;      /* force full row */
+        width: 100%;           /* extra safety */
+        margin: 10px 0 0 0;
+    }
+
+    .search-bar input {
+        flex: 1;
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    .search-bar button {
+        padding: 10px 20px;
+        font-size: 16px;
+    }
 }
 
+/* -------------------- DESKTOP -------------------- */
+@media (min-width: 769px) {
+    /* Hide mobile sidebar and hamburger */
+    #mobileSidebar {
+        display: none !important;
+    }
 
-#accountMenu button:hover {
-    background: #e60000;
+    .hamburger {
+        display: none !important;
+    }
+
+    /* Header layout for desktop */
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: nowrap; /* everything in one row */
+        padding: 0 40px;
+        height: 60px;
+    }
+
+    .logo {
+        flex: 0 0 auto; /* logo doesn't stretch */
+        font-size: 24px;
+    }
+
+    .search-bar {
+        flex: 1; /* fill the space between logo and right section */
+        display: flex;
+        margin: 0 20px;
+    }
+
+    .search-bar input {
+        flex: 1;
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    .search-bar button {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px; /* spacing between Account, Orders, Cart */
+    }
+
+    .header-right > div {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* keeps “Account & Lists” stacked inside itself */
+        line-height: 1.2;
+    }
 }
+
