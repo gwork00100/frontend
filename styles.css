@@ -316,6 +316,28 @@ button {
 }
 
 
+@media (max-width: 768px) {
+    #accountHello {
+        display: none;
+    }
+    #accountMain {
+        color: white;           /* adjust if needed */
+        text-align: center;
+        font-weight: bold;
+        visibility: hidden;      /* hide original text */
+        position: relative;
+    }
+
+    #accountMain::after {
+        content: "Sign In";
+        visibility: visible;
+        position: absolute;
+        left: 0;
+        right: 0;
+    }
+}
+
+
 /* -------------------- HIDE RETURNS & ORDERS ON MOBILE -------------------- */
 @media (max-width: 768px) {
     .returns-orders {
