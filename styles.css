@@ -232,7 +232,7 @@ button {
     .logo {
         order: 2;
         flex: none; /* do NOT stretch */
-        margin-left: 10px; /* hug hamburger */
+        margin-left: 2px; /* hug hamburger */
         font-size: 20px;
     }
 
@@ -264,42 +264,43 @@ button {
     }
 }
 @media (max-width: 768px) {
-
+    /* Header layout for mobile */
     .header {
         display: flex;
-        flex-wrap: wrap;       /* allow multiple rows */
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-start; /* move hamburger + logo to left */
+        gap: 5px; /* space between hamburger and logo */
+        flex-wrap: wrap;
         padding: 10px 15px;
         height: auto;
     }
 
     .hamburger {
-        display: block;
         order: 1;
         font-size: 28px;
     }
 
     .logo {
-        flex: 1;
-        text-align: center;
         order: 2;
+        flex: none; /* prevent stretching */
         font-size: 20px;
+        margin-left: 0; /* no extra space */
     }
 
     .header-right {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    margin-left: auto; /* keeps them hugging the right */
-}
-
+        order: 3;
+        margin-left: auto; /* push account/cart to right */
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
 
     .search-bar {
         order: 4;
-        flex-basis: 100%;      /* force full row */
-        width: 100%;           /* extra safety */
+        flex-basis: 100%;      /* full width row */
+        width: 100%;           /* safety */
         margin: 10px 0 0 0;
+        display: flex;
     }
 
     .search-bar input {
@@ -316,6 +317,7 @@ button {
 }
 
 
+
 /* Force Account box to just say "Sign In" */
 #accountHello,
 #accountMain {
@@ -329,6 +331,8 @@ button {
     font-weight: bold;
     text-align: center;
 }
+
+
 @media (max-width: 768px) {
     #accountHello {
         display: none;
