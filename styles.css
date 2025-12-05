@@ -316,6 +316,19 @@ button {
 }
 
 
+/* Force Account box to just say "Sign In" */
+#accountHello,
+#accountMain {
+    display: none !important; /* hide existing text */
+}
+
+.account::after {
+    content: "Sign In";
+    display: block;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
 @media (max-width: 768px) {
     #accountHello {
         display: none;
