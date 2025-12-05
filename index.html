@@ -530,9 +530,12 @@ document.getElementById("cartIcon").onclick = () => {
 };
 
 // Returns / Orders → open checkout
-document.querySelector(".orders").onclick = () => {
-    renderCheckout();
-};
+const orders = document.querySelector(".returns-orders");
+if (orders) {
+    orders.onclick = () => renderCheckout();
+}
+
+
 
 /* -------------------- LOGO CLICK → GO HOME ----------------------- */
 document.getElementById("logoLink").onclick = (e) => {
@@ -544,6 +547,14 @@ document.getElementById("logoLink").onclick = (e) => {
 
 
 </script>
+<div id="aiChatButton">💬</div>
+<div id="aiChatWindow"></div>
+
+<script type="module" src="aiChat.js"></script>
+
+
+
+
 
 </body>
 </html>

@@ -380,3 +380,30 @@ button {
     }
 }
 
+/* --- AI CHAT OVERRIDE --- */
+#aiChatButton {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    background: #007bff !important;
+    color: white !important;
+    padding: 15px !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    font-size: 22px !important;
+    z-index: 999999 !important;
+}
+
+#aiChatWindow {
+    position: fixed !important;
+    bottom: 80px !important;
+    right: 20px !important;
+    width: 320px !important;
+    height: 420px !important;
+    background: white !important;
+    border: 1px solid #ccc !important;
+    border-radius: 10px !important;
+    display: none;
+    flex-direction: column;
+    z-index: 999999 !important;
+}
